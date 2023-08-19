@@ -66,6 +66,10 @@ ipcMain.on("maximize", () => {
   }
 });
 
+ipcMain.on("unminimize", () => {
+  BrowserWindow.getFocusedWindow().restore();
+})
+
 ipcMain.on("close", (event) => {
   BrowserWindow.getFocusedWindow().close();
 });
@@ -84,6 +88,15 @@ ipcMain.on("save", (event, {title, ending, text}) => {
   //if dir dont exist
   if (!fs.existsSync(`./data/${title}`)) {
     fs.mkdir(`./data/${title}`, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+
+  // if doc exists rename it to .bak
+  if (fs.existsSync(`./data/${title}/SAVE${ending}`)) {
+    fs.renameSync(`./data/${title}/SAVE${ending}`, `./data/${title}/SAVE${ending}.bak`, (err) => {
       if (err) {
         console.log(err);
       }

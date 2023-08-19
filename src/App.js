@@ -38,9 +38,17 @@ function App() {
   }
 
   const closeCmd = () => {
-    if (text !== "") {
-      const result = window.confirm("You have unsaved changes. Are you sure you want to exit?");
+    if (text !== lastSavedText) {
+      const result = window.confirm("You have unsaved changes. Are you sure you want to exit? (Your changes will be lost). If you want to save, click cancel and then click the save button. (The applicaition will 'bounce' to the taskbar to mitigate a focus bug)");
       if (!result) {
+        //window is bugged after the dialogue box,fix by minimizing
+        ipcRenderer.send('minimize');
+        
+        //take out of minimized state
+        setTimeout(() => {
+          ipcRenderer.send('unminimize');
+        }, 100);
+
         return;
       }
     }
@@ -54,6 +62,8 @@ function App() {
       title: title,
       ending: ending
     });
+
+    setLastSavedText(text);
 
     setSaveStatus("SAVED");
       setMins(5);
@@ -72,6 +82,8 @@ function App() {
 
   const [height, setHeight] = useState(window.innerHeight);
   const [width, setWidth] = useState(window.innerWidth);
+
+  const [lastSavedText, setLastSavedText] = useState("");
 
 
   useEffect(() => {
@@ -112,7 +124,7 @@ function App() {
               setEnding(
                 formats[(formats.indexOf(ending) + 1) % formats.length]
               );
-            }}>{ending}</a>
+            }}>{ending + (text !== lastSavedText ? "*" : "")}</a>
           </div>
           <div className='buttons'>
             <a className='button min' onClick={minimize}>
