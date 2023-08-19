@@ -1,22 +1,30 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 function createWindow () {
   // Create the browser window.
   const win = new BrowserWindow({
-    width:350,
-    height:430,
-    minHeight:350,
-    minWidth:350,
+    width:400,
+    height:400,
+    minHeight:400,
+    minWidth:400,
     frame: false,
 
     backgroundColor:'#0D0D0D',
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule:true,
+      contextIsolation: false,
+      preload: __dirname + '/preload.js'
     }
   })
 
   //load the index.html from a url
   win.loadURL('http://localhost:3000');
+
+  // Open the DevTools.
+  win.webContents.openDevTools({
+    mode:'detach'
+  });
 }
 
 // This method will be called when Electron has finished
@@ -44,3 +52,24 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+ipcMain.on("minimize", () => {
+  BrowserWindow.getFocusedWindow().minimize();
+});
+
+ipcMain.on("maximize", () => {
+  if (BrowserWindow.getFocusedWindow().isMaximized()) {
+    BrowserWindow.getFocusedWindow().restore();
+  }
+  else {
+    BrowserWindow.getFocusedWindow().maximize();
+  }
+});
+
+ipcMain.on("close", (modified) => {
+
+  if (modified) {
+    //are you sure you want to close?
+  }
+
+  BrowserWindow.getFocusedWindow().close();
+});

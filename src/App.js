@@ -1,29 +1,144 @@
 import './App.css';
 
+import min from './images/buttons/min.png';
+import full from './images/buttons/full.png';
+import close from './images/buttons/close.png';
+import save from './images/status/save.png';
+import { useEffect, useState } from 'react';
+
+const splashTexts = [
+  "Squeeze Your Brain Juices... 🧠🧃🖥️",
+  "What's On Your Mind? ❔⬆️🤯",
+  "Capture Your Thoughts... 📝🪶💡",
+  "Write Your Heart Out... ❤️📝💘",
+  "Tackle Your Tasks... 📝📅📆",
+  "Do Without Distractions... 📝🚫📱",
+]
+
+const formats = [
+  ".txt",
+  // ".blank",
+  // ".md",
+  // ".html",
+]
+
+const selectedSplash = splashTexts[Math.floor(Math.random() * splashTexts.length)];
+
+// electron
+const { ipcRenderer } = window.require('electron');
+
 function App() {
+
+  const minimize = () => {
+    ipcRenderer.send('minimize');
+  }
+
+  const maximize = () => {
+    ipcRenderer.send('maximize');
+  }
+
+  const closeCmd = () => {
+    ipcRenderer.send('close', {
+      modified: text !== ""
+    });
+  }
+
+  const saveCmd = () => {
+    ipcRenderer.send('save', {
+      title: title,
+      ending: ending,
+      text: text
+    });
+
+    setSaveStatus("SAVED");
+      setMins(5);
+
+      setTimeout(() => {
+        setSaveStatus("AWAITING");
+      }, 2000);
+  }
+
+  const [title, setTitle] = useState("UNTITLED");
+  const [ending, setEnding] = useState(".txt");
+  const [saveStatus, setSaveStatus] = useState("AWAITING"); //UNSAVED, AWAITING, SAVED
+  const [mins, setMins] = useState(5);
+
+  const [text, setText] = useState("");
+
+  const [height, setHeight] = useState(window.innerHeight);
+  const [width, setWidth] = useState(window.innerWidth);
+
+
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      setHeight(window.innerHeight);
+      setWidth(window.innerWidth);
+    });
+
+    setInterval(() => {
+      if (mins === 0) {
+        saveCmd();
+      } else {
+        setMins(mins - 1);
+      }
+    }, 60 * 1000);
+  }
+  , []);
+
   return (
     <div style={{width: '100vw', height: '100vh', overflow: "hidden"}}>
       <div className='draggable bg'>
         <div className='starboard'>
           <div className='title'>
-            <p className='titleText'>Unsaved</p>
-            <p className='titleEnding'>.txt</p>
+            <input style={{width:
+              Math.max(75, Math.min(width - 200, title.length * 15))
+            }} className='titleTextInput' onBlur={() => {
+              if (title === "") {
+                setTitle("UNTITLED");
+              }
+            }} value={title} onChange={(e) => {
+              setTitle(e.target.value);
+            }}/>
+            <a className='titleEnding' onClick={() => {
+              setEnding(
+                formats[(formats.indexOf(ending) + 1) % formats.length]
+              );
+            }}>{ending}</a>
           </div>
           <div className='buttons'>
-            <div className='button min'>
-              <img src='./public/images/buttons/min.png' alt='min'/>
-            </div>
-            <div className='button max'>
-              <img src='./public/images/buttons/max.png' alt='max'/>
-            </div>
-            <div className='button close'>
-              <img src='./public/images/buttons/close.png' alt='close'/>
-            </div>
+            <a className='button min' onClick={minimize}>
+              <img src={min} className='button' alt='min' />
+            </a>
+            <a className='button full'>
+              <img src={full} className='button' alt='full' onClick={maximize}/>
+            </a>
+            <a className='button close' onClick={closeCmd}>
+              <img src={close} className='button' alt='close'/>
+            </a>
           </div>
         </div>
 
-        <textarea className='textArea' contentEditable placeholder='Brain Juice Here... 🧠🧃🖥️'>
-        </textarea>
+        <textarea className='textArea' placeholder={
+          selectedSplash
+        } style={{height: height  - 105}} onChange={(e) => {
+          setText(e.target.value);
+        }}/>
+
+        <div className='bottomBar'>
+          <div className='saveStatus'>
+            <div onClick={saveCmd} className='button saveContainer'> 
+              <img src={save} className='save' alt='save'/>
+            </div>
+            <p className='status'>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
+          </div>
+          <div className='right'>
+            <p className='status'>{
+              text.split('').length == 0 ? 0 : text.split(' ').length
+            } WORDS | {
+              text.split('').length
+            } CHARACTERS</p>
+          </div>
+        </div>
       </div>
     </div>
   );
