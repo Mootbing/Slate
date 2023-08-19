@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
+const fs = require('fs')
 
 function createWindow () {
   // Create the browser window.
@@ -65,11 +66,33 @@ ipcMain.on("maximize", () => {
   }
 });
 
-ipcMain.on("close", (modified) => {
+ipcMain.on("close", (event) => {
+  BrowserWindow.getFocusedWindow().close();
+});
 
-  if (modified) {
-    //are you sure you want to close?
+ipcMain.on("save", (event, {title, ending, text}) => {
+
+  //if dir dont exist
+  if (!fs.existsSync(`./data/`)) {
+    fs.mkdir(`./data/`, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
   }
 
-  BrowserWindow.getFocusedWindow().close();
+  //if dir dont exist
+  if (!fs.existsSync(`./data/${title}`)) {
+    fs.mkdir(`./data/${title}`, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+
+  fs.writeFile(`./data/${title}/SAVE${ending}`, text, (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
 });

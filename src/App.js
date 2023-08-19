@@ -38,16 +38,21 @@ function App() {
   }
 
   const closeCmd = () => {
-    ipcRenderer.send('close', {
-      modified: text !== ""
-    });
+    if (text !== "") {
+      const result = window.confirm("You have unsaved changes. Are you sure you want to exit?");
+      if (!result) {
+        return;
+      }
+    }
+
+    ipcRenderer.send('close');
   }
 
   const saveCmd = () => {
     ipcRenderer.send('save', {
+      text: text,
       title: title,
-      ending: ending,
-      text: text
+      ending: ending
     });
 
     setSaveStatus("SAVED");
@@ -60,7 +65,7 @@ function App() {
 
   const [title, setTitle] = useState("UNTITLED");
   const [ending, setEnding] = useState(".txt");
-  const [saveStatus, setSaveStatus] = useState("AWAITING"); //UNSAVED, AWAITING, SAVED
+  const [saveStatus, setSaveStatus] = useState("UNSAVED"); //UNSAVED, AWAITING, SAVED
   const [mins, setMins] = useState(5);
 
   const [text, setText] = useState("");
@@ -76,6 +81,10 @@ function App() {
     });
 
     setInterval(() => {
+      if (saveStatus === "UNSAVED") {
+        return;
+      }
+
       if (mins === 0) {
         saveCmd();
       } else {
@@ -129,7 +138,7 @@ function App() {
             <div onClick={saveCmd} className='button saveContainer'> 
               <img src={save} className='save' alt='save'/>
             </div>
-            <p className='status'>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
+            <p className='status' style={{color: saveStatus == "UNSAVED" ? "#ffff66" : "#AFAFAF"}}>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
           </div>
           <div className='right'>
             <p className='status'>{
