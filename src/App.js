@@ -22,6 +22,8 @@ const formats = [
   // ".html",
 ]
 
+const minsBetweenAutosave = 5;
+
 const selectedSplash = splashTexts[Math.floor(Math.random() * splashTexts.length)];
 
 // electron
@@ -70,7 +72,7 @@ function App() {
 
   const closeCmd = () => {
     if (text !== lastSavedText) {
-      const result = window.confirm("You have unsaved changes. Are you sure you want to exit? (Your changes will be lost). If you want to save, click cancel and then click the save button. (The applicaition will 'bounce' to the taskbar to mitigate a focus bug)");
+      const result = window.confirm("You have unsaved changes. Your changes will be lost if you exit. Click OK to exit. If you want to save, click cancel and then click the save button. (The applicaition will 'bounce' to the taskbar to mitigate a focus bug)");
       if (!result) {
         //window is bugged after the dialogue box,fix by minimizing
         ipcRenderer.send('minimize');
@@ -97,7 +99,7 @@ function App() {
     setLastSavedText(text);
 
     setSaveStatus("SAVED");
-    setMins(5);
+    setMins(minsBetweenAutosave);
 
     setTimeout(() => {
       setSaveStatus("AWAITING");
@@ -107,7 +109,7 @@ function App() {
   const [title, setTitle] = useState("UNTITLED");
   const [ending, setEnding] = useState(".txt");
   const [saveStatus, setSaveStatus] = useState("UNSAVED"); //UNSAVED, AWAITING, SAVED
-  const [mins, setMins] = useState(5);
+  const [mins, setMins] = useState(minsBetweenAutosave);
 
   const [text, setText] = useState("");
 
@@ -123,20 +125,26 @@ function App() {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
     });
-
-    setInterval(() => {
-      if (saveStatus === "UNSAVED") {
-        return;
-      }
-
-      if (mins === 0) {
-        saveCmd();
-      } else {
-        setMins(mins - 1);
-      }
-    }, 60 * 1000);
   }
   , []);
+
+  useEffect(() => {
+
+    if (saveStatus !== "AWAITING") {
+      return;
+    }
+
+    console.log(mins == 0 ? "Autosaving Now" : ("Autosaving in " + mins + " minutes"))
+
+    if (mins === 0) {
+      saveCmd();
+      return;
+    }
+
+    setTimeout(() => {
+        setMins(mins - 1);
+    }, 60 * 1000);
+  }, [saveStatus, mins]);
 
   return (
     <div style={{width: '100vw', height: '100vh', overflow: "hidden"}}>
