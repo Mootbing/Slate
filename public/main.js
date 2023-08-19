@@ -10,6 +10,8 @@ function createWindow () {
     minWidth:400,
     frame: false,
 
+    icon: __dirname + '/icon.ico',
+
     backgroundColor:'#0D0D0D',
     webPreferences: {
       nodeIntegration: true,
@@ -66,9 +68,9 @@ ipcMain.on("maximize", () => {
   }
 });
 
-ipcMain.on("unminimize", () => {
-  BrowserWindow.getFocusedWindow().restore();
-})
+// ipcMain.on("unminimize", () => {
+//   BrowserWindow.getFocusedWindow().restore();
+// })
 
 ipcMain.on("close", (event) => {
   BrowserWindow.getFocusedWindow().close();
@@ -77,8 +79,8 @@ ipcMain.on("close", (event) => {
 ipcMain.on("save", (event, {title, ending, text}) => {
 
   //if dir dont exist
-  if (!fs.existsSync(`./data/`)) {
-    fs.mkdir(`./data/`, (err) => {
+  if (!fs.existsSync(`./slates/`)) {
+    fs.mkdir(`./slates/`, (err) => {
       if (err) {
         console.log(err);
       }
@@ -86,8 +88,8 @@ ipcMain.on("save", (event, {title, ending, text}) => {
   }
 
   //if dir dont exist
-  if (!fs.existsSync(`./data/${title}`)) {
-    fs.mkdir(`./data/${title}`, (err) => {
+  if (!fs.existsSync(`./slates/${title}`)) {
+    fs.mkdir(`./slates/${title}`, (err) => {
       if (err) {
         console.log(err);
       }
@@ -95,15 +97,15 @@ ipcMain.on("save", (event, {title, ending, text}) => {
   }
 
   // if doc exists rename it to .bak
-  if (fs.existsSync(`./data/${title}/SAVE${ending}`)) {
-    fs.renameSync(`./data/${title}/SAVE${ending}`, `./data/${title}/SAVE${ending}.bak`, (err) => {
+  if (fs.existsSync(`./slates/${title}/SAVE${ending}`)) {
+    fs.renameSync(`./slates/${title}/SAVE${ending}`, `./slates/${title}/SAVE${ending}.bak`, (err) => {
       if (err) {
         console.log(err);
       }
     });
   }
 
-  fs.writeFile(`./data/${title}/SAVE${ending}`, text, (err) => {
+  fs.writeFile(`./slates/${title}/SAVE${ending}`, text, (err) => {
     if (err) {
       console.log(err);
     }

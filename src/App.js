@@ -27,6 +27,37 @@ const selectedSplash = splashTexts[Math.floor(Math.random() * splashTexts.length
 // electron
 const { ipcRenderer } = window.require('electron');
 
+function Key ({keyChar, index}) {
+
+  const [style, setStyle] = useState({});
+  const [display, setDisplay] = useState(true);
+
+  const newStyle = {
+    // left: "50%",
+    left: Math.random() * 100 + "%",
+    bottom: "100%",
+    opacity: 0,
+    transform: "scale(5) translate(-50%, -50%)" + "rotate(" + (Math.random() * 30 - 15) + "deg)",
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      setStyle(newStyle);
+    }, 25);
+
+    setTimeout(() => {
+      setDisplay(false);
+    }
+    , 2000);
+  }, []);
+
+  if (!display) {
+    return null;
+  }
+
+  return <p className='key' style={style}>{keyChar}</p>
+}
+
 function App() {
 
   const minimize = () => {
@@ -66,11 +97,11 @@ function App() {
     setLastSavedText(text);
 
     setSaveStatus("SAVED");
-      setMins(5);
+    setMins(5);
 
-      setTimeout(() => {
-        setSaveStatus("AWAITING");
-      }, 2000);
+    setTimeout(() => {
+      setSaveStatus("AWAITING");
+    }, 2000);
   }
 
   const [title, setTitle] = useState("UNTITLED");
@@ -85,6 +116,7 @@ function App() {
 
   const [lastSavedText, setLastSavedText] = useState("");
 
+  const [keysPressed, setKeysPressed] = useState([]);
 
   useEffect(() => {
     window.addEventListener('resize', () => {
@@ -109,6 +141,12 @@ function App() {
   return (
     <div style={{width: '100vw', height: '100vh', overflow: "hidden"}}>
       <div className='draggable bg'>
+        {
+          //display key animation thing
+          keysPressed.map((key, index) => {
+            return <Key key={index} keyChar={key}/>
+          })
+        }
         <div className='starboard'>
           <div className='title'>
             <input style={{width:
@@ -141,16 +179,23 @@ function App() {
 
         <textarea className='textArea' placeholder={
           selectedSplash
-        } style={{height: height  - 105}} onChange={(e) => {
+        } style={{height: height  - 110}} onChange={(e) => {
           setText(e.target.value);
-        }}/>
+        }}
+        onKeyDown={(e) => {
+
+          const next = keysPressed.concat(e.key)
+
+          setKeysPressed(next);
+        }}
+        />
 
         <div className='bottomBar'>
           <div className='saveStatus'>
             <div onClick={saveCmd} className='button saveContainer'> 
               <img src={save} className='save' alt='save'/>
             </div>
-            <p className='status' style={{color: saveStatus == "UNSAVED" ? "#ffff66" : "#AFAFAF"}}>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
+            <p className='status' style={{color: saveStatus == "UNSAVED" ? "#fff" : "#AFAFAF"}}>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
           </div>
           <div className='right'>
             <p className='status'>{
