@@ -39,7 +39,7 @@ function Key ({keyChar, index}) {
     left: Math.random() * 100 + "%",
     bottom: "100%",
     opacity: 0,
-    transform: "scale(5) translate(-50%, -50%)" + "rotate(" + (Math.random() * 30 - 15) + "deg)",
+    transform: "scale("+ Math.max(window.innerWidth / 400 * 5, 10) + ") translate(-50%, -50%)" + "rotate(" + (Math.random() * 30 - 15) + "deg)",
   }
 
   useEffect(() => {
@@ -120,6 +120,8 @@ function App() {
 
   const [keysPressed, setKeysPressed] = useState([]);
 
+  const [titleHovered, setTitleHovered] = useState(false);
+
   useEffect(() => {
     window.addEventListener('resize', () => {
       setHeight(window.innerHeight);
@@ -157,8 +159,15 @@ function App() {
         }
         <div className='starboard'>
           <div className='title'>
-            <input style={{width:
-              Math.max(75, Math.min(width - 200, title.length * 15))
+            <input onMouseOver={() => {
+              setTitleHovered(true);
+            }} onMouseLeave={() => {
+              setTitleHovered(false);
+            }} 
+            style={{width: titleHovered ? width - 200 : 
+              Math.max(75, Math.min(width - 200, title.length * 15)),
+              border: titleHovered ? "2px solid rgba(255, 255, 255, 0.25)" : "none",
+              borderRadius: 2,
             }} className='titleTextInput' onBlur={() => {
               if (title === "") {
                 setTitle("UNTITLED");
