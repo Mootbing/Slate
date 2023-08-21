@@ -154,6 +154,11 @@ function App() {
         {
           //display key animation thing
           keysPressed.map((key, index) => {
+
+            if (key === "") {
+              return null;
+            }
+
             return <Key key={index} keyChar={key}/>
           })
         }
@@ -200,8 +205,12 @@ function App() {
           setText(e.target.value);
         }}
         onKeyDown={(e) => {
+          let next = keysPressed.concat(e.key);
 
-          const next = keysPressed.concat(e.key)
+          //set all the keys not in last 50 to ""
+          for (let i = 0; i < next.length - 50; i++) {
+            next[i] = "";
+          }
 
           setKeysPressed(next);
         }}
