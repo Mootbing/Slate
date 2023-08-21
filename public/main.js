@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const fs = require('fs')
+const dialog = require('electron').dialog
 
 function createWindow () {
   // Create the browser window.
@@ -76,38 +77,74 @@ ipcMain.on("close", (event) => {
   BrowserWindow.getFocusedWindow().close();
 });
 
-ipcMain.on("save", (event, {title, ending, text}) => {
+ipcMain.on("save", (event, {title, ending, text, path}) => {
 
-  //if dir dont exist
-  if (!fs.existsSync(`./slates/`)) {
-    fs.mkdir(`./slates/`, (err) => {
+  if (path) {
+    fs.writeFile(path, text, (err) => {
       if (err) {
         console.log(err);
       }
     });
+
+    event.sender.send("savePath", path);
+
+    return;
   }
 
-  //if dir dont exist
-  if (!fs.existsSync(`./slates/${title}`)) {
-    fs.mkdir(`./slates/${title}`, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
-
-  // if doc exists rename it to .bak
-  if (fs.existsSync(`./slates/${title}/SAVE${ending}`)) {
-    fs.renameSync(`./slates/${title}/SAVE${ending}`, `./slates/${title}/SAVE${ending}.bak`, (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
-  }
-
-  fs.writeFile(`./slates/${title}/SAVE${ending}`, text, (err) => {
-    if (err) {
-      console.log(err);
+  dialog.showSaveDialog({
+    title: 'Save',
+    defaultPath: `./slates/` + title + ending,
+    filters: [
+      { name: '.txt', extensions: ['txt'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  }).then(result => {
+    if (result.canceled) {
+      return;
     }
+    fs.writeFile(result.filePath, text, (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+
+    event.sender.send("savePath", result.filePath);
+
+  }).catch(err => {
+    console.log(err);
   });
 });
+
+// depr save func
+  // //if dir dont exist
+  // if (!fs.existsSync(`./slates/`)) {
+  //   fs.mkdir(`./slates/`, (err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // }
+
+  // //if dir dont exist
+  // if (!fs.existsSync(`./slates/${title}`)) {
+  //   fs.mkdir(`./slates/${title}`, (err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // }
+
+  // // if doc exists rename it to .bak
+  // if (fs.existsSync(`./slates/${title}/SAVE${ending}`)) {
+  //   fs.renameSync(`./slates/${title}/SAVE${ending}`, `./slates/${title}/SAVE${ending}.bak`, (err) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //   });
+  // }
+
+  // fs.writeFile(`./slates/${title}/SAVE${ending}`, text, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  // });

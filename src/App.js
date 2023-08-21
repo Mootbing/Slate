@@ -93,22 +93,18 @@ function App() {
     ipcRenderer.send('save', {
       text: text,
       title: title,
-      ending: ending
+      ending: ending,
+      path: savePath,
     });
 
     setLastSavedText(text);
-
-    setSaveStatus("SAVED");
-    setMins(minsBetweenAutosave);
-
-    setTimeout(() => {
-      setSaveStatus("AWAITING");
-    }, 2000);
   }
 
   const [title, setTitle] = useState("UNTITLED");
   const [ending, setEnding] = useState(".txt");
-  const [saveStatus, setSaveStatus] = useState("UNSAVED"); //UNSAVED, AWAITING, SAVED
+  const [saveStatus, setSaveStatus] = useState("UNSAVED"); //UNSAVED, AWAITING, SAVING
+  const [savePath, setSavePath] = useState(null);
+
   const [mins, setMins] = useState(minsBetweenAutosave);
 
   const [text, setText] = useState("");
@@ -126,6 +122,17 @@ function App() {
     window.addEventListener('resize', () => {
       setHeight(window.innerHeight);
       setWidth(window.innerWidth);
+    });
+
+    ipcRenderer.on('savePath', (event, path) => {
+      setSavePath(path);
+
+      setSaveStatus("SAVING");
+      setMins(minsBetweenAutosave);
+
+      setTimeout(() => {
+        setSaveStatus("AWAITING");
+      }, 2000);
     });
   }
   , []);
