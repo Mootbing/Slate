@@ -4,6 +4,10 @@ import min from './images/buttons/min.png';
 import full from './images/buttons/full.png';
 import close from './images/buttons/close.png';
 import save from './images/status/save.png';
+
+import cleanSlate from './images/new.png';
+import openFile from './images/open.png';
+
 import { useEffect, useState } from 'react';
 
 const splashTexts = [
@@ -60,7 +64,7 @@ function Key ({keyChar, index}) {
   return <p className='key' style={style}>{keyChar}</p>
 }
 
-function App() {
+function Writer({startingInfo = null}) {
 
   const minimize = () => {
     ipcRenderer.send('minimize');
@@ -127,6 +131,10 @@ function App() {
     ipcRenderer.on('savePath', (event, path) => {
       setSavePath(path);
 
+      let fileName = path.split('\\')[path.split('\\').length - 1];
+
+      setTitle(fileName.split('.')[0]);
+
       setSaveStatus("SAVING");
       setMins(minsBetweenAutosave);
 
@@ -155,9 +163,27 @@ function App() {
     }, 60 * 1000);
   }, [saveStatus, mins]);
 
+  useEffect(() => {
+    if (!startingInfo) {
+      return;
+    }
+
+    setText(startingInfo.text);
+    setLastSavedText(startingInfo.text);
+    document.getElementsByClassName('textArea')[0].innerHTML = startingInfo.text;
+
+    setTitle(startingInfo.title);
+    setEnding(startingInfo.ending);
+
+    setSavePath(startingInfo.filePath);
+
+    setSaveStatus("AWAITING");
+    setMins(minsBetweenAutosave);
+  }, [startingInfo])
+
   return (
     <div style={{width: '100vw', height: '100vh', overflow: "hidden"}}>
-      <div className='draggable bg'>
+      <div className='bg'>
         {
           //display key animation thing
           keysPressed.map((key, index) => {
@@ -183,6 +209,10 @@ function App() {
             }} className='titleTextInput' onBlur={() => {
               if (title === "") {
                 setTitle("UNTITLED");
+              }
+
+              if (title.includes(".")){
+                setTitle(title.replace(".", ""));
               }
             }} value={title} onChange={(e) => {
               setTitle(e.target.value);
@@ -238,6 +268,52 @@ function App() {
             } CHARACTERS</p>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function App () {
+
+  const [openApp, setOpenApp] = useState(false);
+  const [startingInfo, setStartingInfo] = useState(null)
+
+  useEffect(() => {
+    ipcRenderer.on('openFileData', (event, info) => {
+      setStartingInfo(info);
+
+      ipcRenderer.send('changeWindowDim');
+      setOpenApp(true);
+    });
+  }, [])
+
+  if (openApp) {
+    return <Writer startingInfo={startingInfo} />
+  }
+
+  return (
+    <div  style={{width: "100vw", height: "100vh", overflow: "hidden"}}>
+      <div className='decisionBounds'>
+        <div className='decisionContainer'>
+          <div className='new nodrag decision' onClick={() => {
+            // change window height and width
+            ipcRenderer.send('changeWindowDim');
+            setOpenApp(true);
+          }} >
+            <p className='decisionSubheader'>CREATE NEW</p>
+            <p className='decisionHeader'>CLEAN SLATE</p>
+            <img className='decisionImg' src={cleanSlate} width={120} height={120}/>
+          </div>
+          <div onClick={() => {
+            // change window height and width
+            ipcRenderer.send('openFile');
+          }}  className='open nodrag decision'>
+            <p className='decisionSubheader'>CONTINUE ANY</p>
+            <p className='decisionHeader'>TEXT FILES</p>
+            <img className='decisionImg' src={openFile} width={110} height={110}/>
+          </div>
+        </div>
+        <div className='decisionHeaderContainer draggable'/>
       </div>
     </div>
   );

@@ -1,7 +1,100 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
-.draggable {
-  /* -webkit-app-region: drag; */
+
+/* decider */
+
+@keyframes bottomUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
 }
+
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.nodrag {
+  -webkit-app-region: none;
+}
+
+.decisionBounds {
+  width: 100vw;
+  height: 100vh;
+}
+
+.decisionContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.decisionSubheader {
+  color: #AFAFAF;
+  text-align: center;
+  font-family: Open Sans;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 1.6px;
+
+  margin-top: 30px;
+  
+  animation: bottomUp 0.25s ease-out;
+}
+
+.decisionHeader {
+  color: #FFF;
+  font-family: Open Sans;
+  margin-top: -5px;
+  text-align: center;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: 2.8px;
+
+  margin-bottom: 0px;
+
+  animation: bottomUp 0.5s ease-out;
+}
+
+.decision {
+  width: 50vw;
+  height: 100vh;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.decision :hover {
+  cursor: pointer;
+}
+
+.decisionHeaderContainer {
+  position: absolute;
+  z-index: 1000;
+
+  width: 100vw;
+  height: 30px;
+
+  top: 0;
+  left: 0;
+}
+
+.decisionImg {
+  margin-left: 25%;
+  
+  animation: bottomUp 0.75s ease-out;
+}
+
+/* app */
 
 .key {
   position: absolute;
@@ -43,6 +136,8 @@
   align-items: flex-start;
 
   -webkit-app-region: drag;
+
+  animation: bottomUp 0.25s ease-out;
 }
 
 /* title */
@@ -174,6 +269,8 @@
   resize: none;
 
   scrollbar-width: none;
+  
+  animation: bottomUp 0.5s ease-out;
 }
 
 .textArea::-webkit-scrollbar {
@@ -191,6 +288,8 @@
   margin-top: 20px;
 
   margin-top: -15px;
+
+  animation: bottomUp 0.75s ease-out;
 }
 
 .saveStatus {
