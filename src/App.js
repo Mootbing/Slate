@@ -314,6 +314,7 @@ function App () {
           </div>
         </div>
         <div className='decisionHeaderContainer draggable'/>
+        <div className='decisionDivider' />
       </div>
     </div>
   );

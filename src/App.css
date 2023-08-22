@@ -94,6 +94,23 @@
   animation: bottomUp 0.75s ease-out;
 }
 
+.decisionDivider {
+
+  position: absolute;
+  z-index: 1000;
+
+  top: 0px;
+  left: 50%;
+
+  width: 1cap;
+  height: 100vh;
+
+  border-radius: 100px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, rgba(255, 255, 255, 0.25) 52.81%, rgba(255, 255, 255, 0.00) 100%);
+
+  animation: bottomUp 0.75s ease-out;
+}
+
 /* app */
 
 .key {
