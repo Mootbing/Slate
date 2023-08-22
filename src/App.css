@@ -14,6 +14,16 @@
   }
 }
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .draggable {
   -webkit-app-region: drag;
 }
@@ -108,7 +118,7 @@
   border-radius: 100px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, rgba(255, 255, 255, 0.25) 52.81%, rgba(255, 255, 255, 0.00) 100%);
 
-  animation: bottomUp 0.75s ease-out;
+  animation: fadeIn 0.75s ease-out;
 }
 
 /* app */
