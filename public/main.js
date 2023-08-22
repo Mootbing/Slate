@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const fs = require('fs')
 const dialog = require('electron').dialog
+const isDev = require('electron-is-dev')
 
 function createWindow () {
   // Create the browser window.
@@ -24,7 +25,7 @@ function createWindow () {
   })
 
   //load the index.html from a url
-  win.loadURL('http://localhost:3000');
+  win.loadURL(isDev ? 'http://localhost:3000' : `file://${__dirname}/index.html`)
 
   // Open the DevTools.
   // win.webContents.openDevTools({

@@ -1,14 +1,16 @@
 {
-  "name": "slate",
+  "name": "Slate",
   "version": "0.1.0",
   "private": true,
   "main": "public/main.js",
   "author": "Mootbing",
   "description": "A simple text editor with modern aesthetics",
+  "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-is-dev": "^2.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -16,12 +18,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "electron-forge start",
+    "start": "set BROWSER=none && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron-dev": "electron .",
-    "package": "electron-forge package",
+    "package": "electron-builder build --win -c.extraMetadata.main=build/main.js --publish never",
     "make": "electron-forge make"
   },
   "eslintConfig": {
@@ -49,6 +51,20 @@
     "@electron-forge/maker-squirrel": "^6.4.1",
     "@electron-forge/maker-zip": "^6.4.1",
     "@electron-forge/plugin-auto-unpack-natives": "^6.4.1",
-    "electron": "^26.0.0"
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.2.7",
+    "electron": "^26.0.0",
+    "electron-builder": "^24.6.3"
+  },
+  "build": {
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "repo": "slate",
+      "owner": "mootbing"
+    }
   }
 }
