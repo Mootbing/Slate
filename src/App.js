@@ -106,7 +106,7 @@ function Writer({startingInfo = null}) {
 
   const [title, setTitle] = useState("UNTITLED");
   const [ending, setEnding] = useState(".txt");
-  const [saveStatus, setSaveStatus] = useState("UNSAVED"); //UNSAVED, AWAITING, SAVING
+  const [saveStatus, setSaveStatus] = useState("CLICK TO SAVE"); //CLICK TO SAVE, AWAITING, SAVING
   const [savePath, setSavePath] = useState(null);
 
   const [mins, setMins] = useState(minsBetweenAutosave);
@@ -121,6 +121,7 @@ function Writer({startingInfo = null}) {
   const [keysPressed, setKeysPressed] = useState([]);
 
   const [titleHovered, setTitleHovered] = useState(false);
+  const [textAreaFocused, setTextAreaFocused] = useState(false);
 
   useEffect(() => {
     window.addEventListener('resize', () => {
@@ -236,12 +237,27 @@ function Writer({startingInfo = null}) {
           </div>
         </div>
 
-        <textarea className='textArea' placeholder={
-          selectedSplash
-        } style={{height: height  - 110}} onChange={(e) => {
-          setText(e.target.value);
+        <div contentEditable className='textArea' style={{height: height  - 110}} onFocus={() => {
+          setTextAreaFocused(true);
         }}
+        onBlur={() => {
+          setTextAreaFocused(false);
+        }}
+
+        // onChange={(e) => {
+        //   setText(e.target.value);
+        // }}
+
+        onInput={(e) => {
+          setText(e.target.innerHTML);
+        }}
+
         onKeyDown={(e) => {
+          if (e.key.includes("Arrow") || e.key.includes("Volume"))
+          {
+            return;
+          }
+
           let next = keysPressed.concat(e.key);
 
           //set all the keys not in last 50 to ""
@@ -251,14 +267,20 @@ function Writer({startingInfo = null}) {
 
           setKeysPressed(next);
         }}
-        />
+        >
+        </div>
+
+        {<p className='splash' style={{
+          opacity: (!textAreaFocused && text == "" ) ? 1 : 0,
+          transform: (!textAreaFocused && text == "" ) ? "scale(1)" : "scale(0)",
+        }}>{selectedSplash}</p>}
 
         <div className='bottomBar'>
           <div className='saveStatus'>
             <div onClick={saveCmd} className='button saveContainer'> 
               <img src={save} className='save' alt='save'/>
             </div>
-            <p className='status' style={{color: saveStatus == "UNSAVED" ? "#fff" : "#AFAFAF"}}>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
+            <p className='status' style={{color: saveStatus == "CLICK TO SAVE" ? "#fff" : "#AFAFAF"}}>{saveStatus != "AWAITING" ? saveStatus : `Autosave In ${mins}M`}</p>
           </div>
           <div className='right'>
             <p className='status'>{
