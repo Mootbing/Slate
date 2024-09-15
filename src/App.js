@@ -70,21 +70,21 @@ function Writer({startingInfo = null}) {
     ipcRenderer.send('minimize');
   }
 
-  const maximize = () => {
+  const toggleMaximize = () => {
     ipcRenderer.send('maximize');
   }
 
   const closeCmd = () => {
     if (text !== lastSavedText) {
-      const result = window.confirm("You have unsaved changes. Your changes will be lost if you exit. Click OK to exit. If you want to save, click cancel and then click the save button. (The applicaition will 'bounce' to the taskbar to mitigate a focus bug)");
+      const result = window.confirm("You have unsaved changes. Your changes will be lost if you exit. Click OK to exit)");
       if (!result) {
         //window is bugged after the dialogue box,fix by minimizing
-        ipcRenderer.send('minimize');
+        // ipcRenderer.send('minimize');
         
         //take out of minimized state
-        setTimeout(() => {
-          ipcRenderer.send('unminimize');
-        }, 100);
+        // setTimeout(() => {
+        //   ipcRenderer.send('unminimize');
+        // }, 100);
 
         return;
       }
@@ -131,6 +131,7 @@ function Writer({startingInfo = null}) {
     ipcRenderer.on('savePath', (event, path) => {
       setSavePath(path);
 
+      // make this os independent
       let fileName = path.split('\\')[path.split('\\').length - 1];
 
       setTitle(fileName.split('.')[0]);
@@ -227,9 +228,9 @@ function Writer({startingInfo = null}) {
             <a className='button min' onClick={minimize}>
               <img src={min} className='button' alt='min' />
             </a>
-            <a className='button full'>
-              <img src={full} className='button' alt='full' onClick={maximize}/>
-            </a>
+            {/* <a className='button full'>
+              <img src={full} className='button' alt='full' onClick={toggleMaximize}/>
+            </a> */}
             <a className='button close' onClick={closeCmd}>
               <img src={close} className='button' alt='close'/>
             </a>
