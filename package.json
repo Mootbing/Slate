@@ -23,7 +23,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron-dev": "electron .",
-    "package": "electron-builder build --win -c.extraMetadata.main=build/main.js --publish never",
+    "package-win": "electron-builder build --win -c.extraMetadata.main=build/main.js --publish never",
+    "package-mac": "electron-builder build --mac -c.extraMetadata.main=build/main.js --publish never",
     "make": "electron-forge make"
   },
   "eslintConfig": {
